@@ -59,6 +59,8 @@ async function handleSearchPhotoBySubmit(evt) {
     createSimpleLightbox();
     // one of the options how to make it:  page === Math.ceil(totalHits / 40) + 1
     // and another one: totalHits < page * perPage
+    // (page - 1) * 40 >= totalHits
+    // page * 40 === totalHits
     if ((page - 1) * 40 >= totalHits) {
       Notify.info("We're sorry, but you've reached the end of search results.");
       refs.loadMoreBtnEl.classList.add('is-hiden');
