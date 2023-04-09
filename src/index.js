@@ -23,7 +23,7 @@ refs.loadMoreBtnEl.classList.add('is-hiden');
 refs.formEL.addEventListener('submit', handleSearchPhotoBySubmit);
 refs.loadMoreBtnEl.addEventListener('click', handleClickOnBtn);
 
-function handleSearchPhotoBySubmit(evt) {
+async function handleSearchPhotoBySubmit(evt) {
   evt.preventDefault();
 
   page = 1;
@@ -36,61 +36,63 @@ function handleSearchPhotoBySubmit(evt) {
     );
   }
 
-  fetchSearchPhoto(inputValue, page, perPage)
-    .then(({ totalHits, hits }) => {
-      const totalPages = Math.ceil(totalHits / perPage);
-
-      if (hits.length === 0) {
-        refs.loadMoreBtnEl.classList.add('is-hiden');
-        destroyMarkup();
-        return Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-      }
-
-      refs.loadMoreBtnEl.classList.remove('is-hiden');
-
+  try {
+    const { totalHits, hits } = await fetchSearchPhoto(
+      inputValue,
+      page,
+      perPage
+    );
+    // const totalPages = Math.ceil(totalHits / perPage);
+    if (hits.length === 0) {
+      refs.loadMoreBtnEl.classList.add('is-hiden');
       destroyMarkup();
-      makeMessageNumberOfImg(totalHits);
-      createMarkup(hits);
-      createSimpleLightbox();
-
-      if (page >= totalPages) {
-        refs.loadMoreBtnEl.classList.add('is-hiden');
-        Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
-      }
-    })
-    .catch(() => {
-      Notify.failure(
+      return Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
-    });
+    }
+
+    refs.loadMoreBtnEl.classList.remove('is-hiden');
+
+    destroyMarkup();
+    makeMessageNumberOfImg(totalHits);
+    createMarkup(hits);
+    createSimpleLightbox();
+    // one of the options how to make it:  page === Math.ceil(totalHits / 40) + 1
+    if (totalHits < page * perPage) {
+      refs.loadMoreBtnEl.classList.add('is-hiden');
+
+      Notify.info("We're sorry, but you've reached the end of search results.");
+    }
+  } catch (error) {
+    Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
 }
 
-function handleClickOnBtn() {
+async function handleClickOnBtn() {
   page += 1;
 
   simpleLightBox.destroy();
 
-  fetchSearchPhoto(inputValue, page, perPage)
-    .then(({ totalHits, hits }) => {
-      const totalPages = Math.ceil(totalHits / perPage);
+  try {
+    const { totalHits, hits } = await fetchSearchPhoto(
+      inputValue,
+      page,
+      perPage
+    );
+    const totalPages = Math.ceil(totalHits / perPage);
 
-      if (page > totalPages) {
-        refs.loadMoreBtnEl.classList.add('is-hiden');
-        Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
-      }
-      createMarkup(hits);
-      createSimpleLightbox();
-      pageScroll();
-    })
-    .catch(error => {
-      console.log(error);
-    });
+    if (page > totalPages) {
+      refs.loadMoreBtnEl.classList.add('is-hiden');
+      Notify.info("We're sorry, but you've reached the end of search results.");
+    }
+    createMarkup(hits);
+    createSimpleLightbox();
+    pageScroll();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function createMarkup(data) {
