@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { Loading } from 'notiflix/build/notiflix-loading-aio';
 import simpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import fetchSearchPhoto from './js/fetchImg';
@@ -11,6 +12,13 @@ const refs = {
   gallaryEl: document.querySelector('.gallery'),
   submitBtnEl: document.querySelector("button[type='submit']"),
   loadMoreBtnEl: document.querySelector('.load-more'),
+};
+
+const messageOptions = {
+  timeout: 4000,
+  pauseOnHover: false,
+  showOnlyTheLastOne: true,
+  fontFamily: 'Montserrat',
 };
 
 let page = 1;
@@ -28,11 +36,14 @@ async function handleSearchPhotoBySubmit(evt) {
 
   page = 1;
 
+  loadingWindow();
+
   inputValue = refs.inputEl.value.trim();
 
   if (inputValue === '') {
     return Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
+      'Sorry, there are no images matching your search query. Please try again.',
+      messageOptions
     );
   }
 
@@ -47,7 +58,8 @@ async function handleSearchPhotoBySubmit(evt) {
       refs.loadMoreBtnEl.classList.add('is-hiden');
       destroyMarkup();
       return Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
+        'Sorry, there are no images matching your search query. Please try again.',
+        messageOptions
       );
     }
 
@@ -62,12 +74,16 @@ async function handleSearchPhotoBySubmit(evt) {
     // (page - 1) * 40 >= totalHits
     // page * 40 === totalHits
     if ((page - 1) * 40 >= totalHits) {
-      Notify.info("We're sorry, but you've reached the end of search results.");
+      Notify.info(
+        "We're sorry, but you've reached the end of search results.",
+        messageOptions
+      );
       refs.loadMoreBtnEl.classList.add('is-hiden');
     }
   } catch (error) {
     Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
+      'Sorry, there are no images matching your search query. Please try again.',
+      messageOptions
     );
   }
 }
@@ -87,7 +103,10 @@ async function handleClickOnBtn() {
 
     if (page > totalPages) {
       refs.loadMoreBtnEl.classList.add('is-hiden');
-      Notify.info("We're sorry, but you've reached the end of search results.");
+      Notify.info(
+        "We're sorry, but you've reached the end of search results.",
+        messageOptions
+      );
     }
     createMarkup(hits);
     createSimpleLightbox();
@@ -121,4 +140,15 @@ function pageScroll() {
     top: cardHeight * 2,
     behavior: 'smooth',
   });
+}
+
+function loadingWindow() {
+  Loading.dots('Wait a second, please...', {
+    backgroundColor: 'rgba(0,59,70,0.8)',
+    // textColor: '#C4DFE6',
+    fontFamily: 'Montserrat',
+    messageFontSize: '20px',
+    messageColor: '#66A5AD',
+  });
+  Loading.remove(1000);
 }
