@@ -13,10 +13,28 @@
 body {
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
-    background-color: #C4DFE6;
+    /* background-color: #C4DFE6; */
+    background: linear-gradient(-45deg, #5e46c7, #4F2EE8, #4b34ae, #341ba5, #725bd9);
+    background-size: 400% 10000%;
+    /* background-repeat: no-repeat; */
+    animation: gradient 10s ease infinite;
     margin: 0px;
     line-height: 1.5;
     font-size: 15;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 a {
@@ -53,6 +71,12 @@ button:hover {
 
 }
 
+.container {
+    width: 100%;
+    position: fixed;
+    z-index: 1;
+}
+
 .search-form {
     text-align: center;
     background-color: #003B46;
@@ -70,12 +94,6 @@ button:hover {
 
 .is-hiden {
     display: none;
-}
-
-.container {
-    width: 100%;
-    position: fixed;
-    z-index: 1;
 }
 
 .gallery {
